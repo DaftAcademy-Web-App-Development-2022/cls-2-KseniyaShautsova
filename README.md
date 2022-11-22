@@ -1,3 +1,9 @@
-# Hippoptype <- nazwa profilu na githubie
+# Kseniya Shautsova Web application project
 
-- [deploy](https://cls-1-hippopotype.vercel.app/)
+## Git link:
+
+https://github.com/KseniyaShautsova/WebApp_DraftAcademy
+
+## Vercel link:
+
+https://cls-1-kseniya-shautsova-eight.vercel.app/
