@@ -1,4 +1,5 @@
-import React, {createContext, useMemo, useReducer, useRef} from "react";
+import React, { createContext, useMemo, useReducer, useRef } from "react";
+
 
 type Action = {
   type: "SET_META",
@@ -16,6 +17,10 @@ type Action = {
 } | {
   type: "SET_DURATION"
   payload: number
+} | {
+  type: "MUTE"
+} | {
+  type: "UNMUTE"
 }
 
 type Meta = {
@@ -31,12 +36,15 @@ type State = {
   currentTime: number;
   progress: number;
   duration: number;
+  muted: boolean;
 }
 
 type Actions = {
   play: (meta?: Meta) => void;
   pause: () => void;
   seek: (time: number) => void;
+  mute: () => void;
+  unmute: () => void;
 }
 
 const initialPlayerState: State = {
@@ -44,6 +52,7 @@ const initialPlayerState: State = {
   currentTime: 0,
   progress: 0,
   duration: 0,
+  muted: false,
 };
 
 const reducer = (state: State, action: Action): State => {
@@ -81,12 +90,26 @@ const reducer = (state: State, action: Action): State => {
       };
     }
 
+    case "MUTE": {
+      return {
+        ...state,
+        muted: true
+      }
+    }
+
+    case "UNMUTE": {
+      return {
+        ...state,
+        muted: false
+      }
+    }
+
     default:
       return initialPlayerState;
   }
 };
 
-export const PlayerContext = createContext<{ state: State, actions: Actions} | null>(null);
+export const PlayerContext = createContext<{ state: State, actions: Actions } | null>(null);
 
 const PlayerProvider = (props: React.PropsWithChildren) => {
   const [state, dispatch] = useReducer(reducer, initialPlayerState);
@@ -118,11 +141,23 @@ const PlayerProvider = (props: React.PropsWithChildren) => {
           playerRef.current?.pause();
         }
       },
-      seek: (time: number) => {
+      seek: (time: number) => { //przewiniecie wartosci
         if (playerRef.current) {
           playerRef.current.currentTime = time;
         }
       },
+      mute: () => {
+        if (playerRef.current) {
+          dispatch({ type: "MUTE" });
+          playerRef.current.muted = true;
+        }
+      },
+      unmute: () => {
+        if (playerRef.current) {
+          dispatch({ type: "UNMUTE" });
+          playerRef.current.muted = false;
+        }
+      }
     }),
     []
   );
@@ -134,7 +169,6 @@ const PlayerProvider = (props: React.PropsWithChildren) => {
       <PlayerContext.Provider value={value} {...props} />
 
       <audio
-        controls
         ref={playerRef}
         onTimeUpdate={() => {
           if (playerRef.current) {
@@ -165,4 +199,3 @@ const PlayerProvider = (props: React.PropsWithChildren) => {
 }
 
 export default PlayerProvider;
-
